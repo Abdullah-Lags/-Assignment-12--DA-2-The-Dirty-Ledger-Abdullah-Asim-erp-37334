@@ -11,7 +11,7 @@ The verdicts below apply to the cleaning operations used in `2_work.ipynb`. I tr
 | Fill the missing price with the mean or median | **REJECT** | There is no source evidence for the missing price. A calculated replacement would be invented data. |
 | Remove exact duplicate rows | **KEEP** | The raw file contains one fully identical repeated row. Removing one copy avoids counting the same record twice. |
 | Convert the price column to numeric after removing commas | **MODIFY / KEEP WITH CHECK** | This is useful because the raw column is text and includes `1,250`. I kept the converted value as 1250 but flagged it for review rather than assuming it is a valid ordinary price. |
-| Convert all item labels to a consistent capitalization | **KEEP, narrowly** | Only the observed lowercase `oil b` label is changed to `Oil B`. The original label is retained in `item_original` so the change can be checked. |
+| Convert all item labels to a consistent capitalization | **MODIFY** | Keep the original `item` label and create `item_normalized_candidate` only for investigation. Normalizing `oil b` to `Oil B` creates a repeated date-item-city key with a different price, so the records must not be merged automatically. |
 | Delete every price above an arbitrary threshold | **REJECT** | A high value is suspicious, but the CSV does not establish the correct value or prove it is an error. The values are retained and flagged. |
 | Replace the unusual `oil b` price with a nearby Oil B price | **REJECT** | The price is unusual compared with other Oil B / City 1 rows, but there is no reliable source for a replacement. |
 | Check the date-item-city combinations after cleaning | **KEEP** | The file has 12 dates, 4 items and 2 cities, so the expected structure is 96 combinations. This check can reveal missing or repeated combinations. |
@@ -31,7 +31,7 @@ The notebook calculates the comparisons directly from the CSV when it runs. The 
 - Expected combinations if there are four intended items: **96**
 - After testing a normalized label, there are **95 distinct normalized keys** and one repeated key with different prices. This unresolved conflict is kept visible.
 
-The price column changes from text (`object`) to numeric (`float64` in the notebook). The missing price remains missing. The unusual values are retained and flagged.
+The price column changes from text to numeric (the exact pandas numeric dtype is shown by the notebook output). The missing price remains missing. The unusual values are retained and flagged. The notebook also displays before-and-after price descriptive statistics and item-frequency counts, including a cross-tabulation by city.
 
 ## B. Reflection
 
